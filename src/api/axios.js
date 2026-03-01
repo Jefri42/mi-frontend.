@@ -20,7 +20,7 @@ import axios from 'axios';
 // La palabra 'proxy' en package.json redirige /api al puerto 8000
 // ============================================================
 const api = axios.create({
-  baseURL: 'http://localhost:8000',  // URL del backend Django
+  baseURL: 'https://ideas-social-backend.onrender.com',  // URL del backend Django
   headers: {
     'Content-Type': 'application/json',
   },
