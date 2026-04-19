@@ -22,5 +22,3 @@ jobs:
 
       - name: Ejecutar linter
         run: npx eslint . || true
-
-        agregando workflow
