@@ -83,7 +83,7 @@ function AppContent() {
       {user && <Navbar />}
 
       {/* Contenido principal — donde se renderizan las páginas */}
-      <main style={{ borderLeft: '1px solid var(--border)', minHeight: '100vh' }}>
+      <main className="main-content">
         <Routes>
           {/* Rutas públicas (login y registro) */}
           <Route path="/login" element={

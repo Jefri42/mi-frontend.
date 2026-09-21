@@ -58,6 +58,18 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  /* Evita el desplazamiento lateral en móvil */
+  overflow-x: hidden;
+}
+
+/* Las imágenes y vídeos nunca desbordan su contenedor */
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+/* Palabras muy largas (URLs sin espacios) no rompen el layout */
+p, h1, h2, h3, a, span {
+  overflow-wrap: break-word;
 }
 
 /* Scrollbar personalizada */
@@ -68,35 +80,261 @@ body {
 
 /* ============================================================
    LAYOUT PRINCIPAL
+   ------------------------------------------------------------
+   Flex en vez de grid: si el usuario NO ha iniciado sesión el
+   sidebar no se renderiza, y con flex el <main> ocupa el ancho
+   completo solo. (Con grid quedaba encajado en la 1ª columna.)
    ============================================================ */
 .app-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr 300px;
+  display: flex;
+  align-items: flex-start;
   min-height: 100vh;
   max-width: 1200px;
   margin: 0 auto;
-  gap: 0;
 }
 
+.main-content {
+  flex: 1;
+  /* min-width:0 evita que texto o imágenes largas desborden el flex item */
+  min-width: 0;
+  min-height: 100vh;
+  border-left: 1px solid var(--border);
+}
+
+/* Sin sidebar (login / registro) no hace falta el borde */
+.app-layout > .main-content:only-child {
+  border-left: none;
+}
+
+/* ============================================================
+   SIDEBAR IZQUIERDO
+   ============================================================ */
+.left-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 260px;
+  width: 260px;
+  gap: 8px;
+  padding: 24px 16px;
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--text-secondary);
+  background: transparent;
+  font-weight: 400;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+.nav-link.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+  font-weight: 600;
+}
+
+.btn-new-idea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  margin-top: 8px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-new-idea:hover { background: var(--accent-hover); }
+
+.sidebar-spacer { flex: 1; }
+
+.sidebar-user {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.sidebar-user-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.sidebar-user-link:hover { background: var(--bg-tertiary); }
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.sidebar-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.sidebar-user-meta { min-width: 0; }
+.sidebar-user-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+}
+.sidebar-user-handle {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.sidebar-user-name,
+.sidebar-user-handle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.btn-logout:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--danger);
+}
+
+/* ============================================================
+   TABLET — sidebar reducido a iconos
+   ============================================================ */
 @media (max-width: 1024px) {
-  .app-layout {
-    grid-template-columns: 80px 1fr;
+  .left-sidebar {
+    flex: 0 0 76px;
+    width: 76px;
+    padding: 24px 12px;
+    align-items: center;
   }
-  .right-sidebar { display: none; }
+  /* Se ocultan las etiquetas: solo quedan los iconos */
+  .nav-label,
+  .sidebar-logo span,
+  .sidebar-user-meta { display: none; }
+
+  .nav-link,
+  .btn-new-idea,
+  .btn-logout,
+  .sidebar-user-link,
+  .sidebar-logo {
+    justify-content: center;
+    padding: 12px;
+    width: 100%;
+  }
+  .btn-new-idea { font-size: 20px; }
 }
 
+/* ============================================================
+   MÓVIL — la barra pasa abajo, en horizontal
+   ============================================================ */
 @media (max-width: 640px) {
-  .app-layout {
-    grid-template-columns: 1fr;
-  }
+  .app-layout { flex-direction: column; }
+
   .left-sidebar {
+    flex: none;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    gap: 4px;
+    padding: 8px 12px;
+    /* Respeta la barra de gestos de iOS/Android */
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+    top: auto;
     z-index: 100;
-    flex-direction: row;
-    height: 60px;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+
+  .sidebar-logo,
+  .sidebar-spacer { display: none; }
+
+  .main-content {
+    width: 100%;
+    border-left: none;
+    /* Espacio para que el último post no quede bajo la barra fija */
+    padding-bottom: 76px;
+  }
+
+  /* El bloque de usuario se aplana: en la barra solo cabe el logout */
+  .sidebar-user {
+    display: flex;
+    align-items: center;
+    border-top: none;
+    padding-top: 0;
+  }
+  .sidebar-user-link { display: none; }
+
+  .nav-link,
+  .btn-new-idea,
+  .btn-logout,
+  .sidebar-user {
+    width: auto;
+    margin-top: 0;
+    padding: 10px 14px;
+  }
+  .btn-new-idea { border-radius: 50%; }
+
+  /* Objetivos táctiles cómodos (mín. recomendado ~44px) */
+  .nav-link,
+  .btn-new-idea,
+  .btn-logout {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
   }
 }
 
@@ -191,7 +429,31 @@ body {
   50% { transform: scale(1.15); }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* Spinner de carga — lo usa <div className="spinner" /> en App.js */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* Respeta a quien pide menos movimiento en el sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* ============================================================
    UTILIDADES
