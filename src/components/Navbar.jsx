@@ -60,135 +60,67 @@ function Navbar() {
     }
   };
 
-  return (
-    <aside style={{
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '24px 16px',
-      borderRight: '1px solid var(--border)',
-      position: 'sticky',
-      top: 0,
-      height: '100vh',
-      gap: '8px',
-    }}>
+  // En móvil la barra está abajo y el compositor arriba del feed,
+  // así que además de enfocar hay que subir la vista hasta él.
+  const focusCompose = () => {
+    const el = document.getElementById('compose-idea');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.focus({ preventScroll: true });
+  };
 
-      {/* Logo */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '12px',
-        marginBottom: '16px',
-        color: 'var(--accent)',
-        fontFamily: 'var(--font-display)',
-        fontSize: '22px',
-        fontWeight: '800',
-      }}>
+  return (
+    <aside className="left-sidebar">
+      {/* Logo — se oculta en móvil, donde la barra pasa a ser inferior */}
+      <div className="sidebar-logo">
         <BulbIcon />
         <span>Ideas</span>
       </div>
 
       {/* Links de navegación */}
       {/* NavLink agrega automáticamente la clase "active" cuando la URL coincide */}
-      <NavLink to="/" end style={navLinkStyle}>
-        <HomeIcon /> <span>Inicio</span>
+      <NavLink to="/" end className={navLinkClass}>
+        <HomeIcon /> <span className="nav-label">Inicio</span>
       </NavLink>
 
-      <NavLink to={`/profile/${user?.username}`} style={navLinkStyle}>
-        <UserIcon /> <span>Mi Perfil</span>
+      <NavLink to={`/profile/${user?.username}`} className={navLinkClass}>
+        <UserIcon /> <span className="nav-label">Mi Perfil</span>
       </NavLink>
 
       {/* Botón de nueva idea */}
-      <button
-        onClick={() => document.getElementById('compose-idea')?.focus()}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '14px',
-          marginTop: '8px',
-          background: 'var(--accent)',
-          color: 'white',
-          border: 'none',
-          borderRadius: 'var(--radius)',
-          fontFamily: 'var(--font-body)',
-          fontSize: '15px',
-          fontWeight: '600',
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-        }}
-      >
-        + Nueva Idea
+      <button onClick={focusCompose} className="btn-new-idea" aria-label="Nueva idea">
+        <span aria-hidden="true">+</span>
+        <span className="nav-label">Nueva Idea</span>
       </button>
 
-      {/* Espaciador */}
-      <div style={{ flex: 1 }} />
+      {/* Espaciador — empuja el bloque de usuario al fondo en escritorio */}
+      <div className="sidebar-spacer" />
 
       {/* Info del usuario y logout */}
       {user && (
-        <div style={{
-          borderTop: '1px solid var(--border)',
-          paddingTop: '16px',
-        }}>
+        <div className="sidebar-user">
           {/* Avatar y nombre */}
-          <NavLink to={`/profile/${user.username}`} style={{ textDecoration: 'none' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px',
-              borderRadius: 'var(--radius-sm)',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              {/* Avatar */}
-              {user.avatar ? (
-                <img src={user.avatar} alt="avatar"
-                  style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%',
-                  background: 'var(--accent)', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center',
-                  color: 'white', fontWeight: '700', fontSize: '16px',
-                }}>
-                  {user.username?.[0]?.toUpperCase()}
-                </div>
-              )}
-              <div>
-                <div style={{ color: 'var(--text-primary)', fontWeight: '600', fontSize: '14px' }}>
-                  {user.first_name || user.username}
-                </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
-                  @{user.username}
-                </div>
+          <NavLink to={`/profile/${user.username}`} className="sidebar-user-link">
+            {user.avatar ? (
+              <img src={user.avatar} alt="avatar" className="sidebar-avatar" />
+            ) : (
+              <div className="sidebar-avatar sidebar-avatar--fallback">
+                {user.username?.[0]?.toUpperCase()}
+              </div>
+            )}
+            <div className="sidebar-user-meta">
+              <div className="sidebar-user-name">
+                {user.first_name || user.username}
+              </div>
+              <div className="sidebar-user-handle">
+                @{user.username}
               </div>
             </div>
           </NavLink>
 
           {/* Botón de logout */}
-          <button
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px',
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '14px',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,107,107,0.1)'; e.currentTarget.style.color = 'var(--danger)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
-          >
-            <LogoutIcon /> Cerrar sesión
+          <button onClick={handleLogout} className="btn-logout" aria-label="Cerrar sesión">
+            <LogoutIcon /> <span className="nav-label">Cerrar sesión</span>
           </button>
         </div>
       )}
@@ -196,20 +128,9 @@ function Navbar() {
   );
 }
 
-// Estilos para los NavLinks
-// La función recibe { isActive } automáticamente de NavLink
-const navLinkStyle = ({ isActive }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '12px',
-  padding: '12px 14px',
-  borderRadius: 'var(--radius-sm)',
-  textDecoration: 'none',
-  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-  background: isActive ? 'var(--accent-glow)' : 'transparent',
-  fontWeight: isActive ? '600' : '400',
-  fontSize: '15px',
-  transition: 'all 0.2s',
-});
+// Clases para los NavLinks.
+// NavLink pasa { isActive } automáticamente cuando la URL coincide.
+const navLinkClass = ({ isActive }) =>
+  isActive ? 'nav-link active' : 'nav-link';
 
 export default Navbar;
